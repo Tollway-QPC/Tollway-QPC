@@ -1,0 +1,23 @@
+#Rust
+/target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+#IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+#Keys & Secrets (Just in case i do something stupid)
+*.key
+*.pem
+*.enc
+*.priv
+/test-keys/
+
+#Benchmarks and profiling
+criterion/
