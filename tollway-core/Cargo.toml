@@ -5,5 +5,38 @@ edition.workspace = true
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Post-quantum cryptographic primitives with forward secrecy and authentication"
 
 [dependencies]
+#PQ Primatives
+pqcrypto-kem.workspace = true
+pqcrypto-sign.workspace = true
+
+# Symmetric Primitives
+chacha20poly1305 = "0.10"
+hkdf.workspace = true
+sha3.workspace = true
+
+#Utils
+zeroize.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+serde = { workspace = true, optional = true }
+
+[dev-dependencies]
+crtierion.workspace = true
+quickcheck.workspace = true
+proptest.workspace = true
+hex = "0.4"
+
+[features]
+default = []
+serde = ["dep:serde"]
+std = []
+
+[[bench]]
+name = "seal_open_bench"
+harness = false

@@ -1,5 +1,35 @@
-// lib.rs - Public API surface, re-exports types and functions
+//! Tollway-Core: Post-quantum cryptographic primitives
+//!
+//! Provides quantum-resistant encryption with forward secrecy and authentication.
+//! Built on NIST-standardized algorithms: ML-KEM-768, ML-DSA-65, ChaCha20-Poly1305.
 
-// expose: seal(), open(), KeyPair::generate(), PublicKey
-// version tag: TOLLWAY_V1
-// feature flags for algorithm selection (future)
+#![forbid(unsafe_code)]
+#![warn(missing_docs, rust_2018_idioms, missing_copy_implementations, bad-style, unused, rust_2024_compatibility)]
+
+pub mod constants;
+pub mod error;
+pub mod primitives;
+pub mod secure;
+pub mod types;
+pub mod wire;
+
+mod open;
+mod seal;
+
+pub use error::TollwayError;
+pub use types::{KeyPair, PublicKey};
+
+pub fn seal(
+    plaintext: &[u8],
+    sender_keypair: &KeyPair,
+    recipient_public_key: &PublicKey,
+) -> Result<Vec<u8>, TollwayError> {
+    seal::seal(plaintext, sender_keypair, recipient_public_key)
+}
+
+pub fn open(
+    ciphertext: &[u8],
+    recipient_keypair: &KeyPair,
+) -> Result<(Vec<u8>, PublicKey), TollwayError> {
+    open::open(ciphertext, recipient_keypair)
+}
