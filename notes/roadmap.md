@@ -24,7 +24,7 @@
 
 ---
 
-## V1.1 - Performance & Observability (Q2 2024)
+## V1.1 - Performance & Observability (Q2 2026)
 
 **Performance**:
 
@@ -48,7 +48,7 @@
 
 ---
 
-## V1.2 - Hybrid Mode (Q3 2024)
+## V1.2 - Hybrid Mode (Q3 2026)
 
 **Classical + PQC Hybrid**:
 
@@ -72,7 +72,7 @@ let ciphertext = seal_hybrid(plaintext, &hybrid_keypair, &their_pk)?;
 
 ---
 
-## V2.0 - Migration & Compatibility (Q4 2024)
+## V2.0 - Migration & Compatibility (Q4 2026)
 
 **tollway-migrate crate**:
 
@@ -92,7 +92,7 @@ let ciphertext = seal_hybrid(plaintext, &hybrid_keypair, &their_pk)?;
 
 ---
 
-## V2.1 - Advanced Key Management (Q1 2025)
+## V2.1 - Advanced Key Management (Q1 2027)
 
 **Features**:
 
@@ -109,7 +109,7 @@ let ciphertext = seal_hybrid(plaintext, &hybrid_keypair, &their_pk)?;
 
 ---
 
-## V3.0 - Sessions & Protocols (Q2 2025)
+## V3.0 - Sessions & Protocols (Q2 2027)
 
 **tollway-session crate**:
 
@@ -128,7 +128,7 @@ let ciphertext = seal_hybrid(plaintext, &hybrid_keypair, &their_pk)?;
 
 ---
 
-## V3.1 - Formal Verification (Q3 2025)
+## V3.1 - Formal Verification (Q3 2027)
 
 **Verified Components**:
 
@@ -146,7 +146,7 @@ let ciphertext = seal_hybrid(plaintext, &hybrid_keypair, &their_pk)?;
 
 ---
 
-## Long-Term Vision (2026+)
+## Long-Term Vision (2027+)
 
 **Ecosystem**:
 
@@ -187,4 +187,4 @@ This roadmap is a living document. Priorities shift based on:
 3. **Regulatory changes**: New compliance requirements move features forward
 4. **Dependency updates**: Upstream PQC library improvements unlock new capabilities
 
-**Last updated**: 02/05/2026
+**Last updated**: 02/08/2026
