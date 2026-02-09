@@ -31,13 +31,21 @@ pub fn open(
     let aead_key = kdf::derive_aead_key(&shared_secret)?;
     let aead_nonce = kdf::derive_aead_nonce(&shared_secret)?;
 
-    // Decrypt and verify AEAD
-    let plaintext = aead::decrypt(&aead_key, &aead_nonce, &parsed.aead_ciphertext)?;
+    // Rebuild AAD: must match exactly what was used during seal()
+    let aad = aead::build_aad(
+        &parsed.sender_signing_public.0,
+        &recipient_keypair.kem.public.0,
+        &parsed.ephemeral_kem_public.0,
+    );
+
+    // Decrypt and verify AEAD (with associated data)
+    let plaintext = aead::decrypt(&aead_key, &aead_nonce, &parsed.aead_ciphertext, &aad)?;
 
     // Return plaintext and verified sender public key
+    // Note: sender_kem_public is empty in V1 wire format - only signing key is included
     let sender_pk = PublicKey {
         signing: parsed.sender_signing_public,
-        kem: parsed.sender_kem_public, // Not in V1, but included for future
+        kem: parsed.sender_kem_public,
     };
 
     Ok((plaintext, sender_pk))

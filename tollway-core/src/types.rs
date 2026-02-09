@@ -76,6 +76,34 @@ pub struct PublicKey {
     pub(crate) kem: KEMPublicKey,
 }
 
+impl std::fmt::Debug for PublicKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // Only show first 8 bytes of each key to avoid huge debug output
+        let signing_preview: Vec<_> = self.signing.0.iter().take(8).collect();
+        let kem_preview: Vec<_> = self.kem.0.iter().take(8).collect();
+        f.debug_struct("PublicKey")
+            .field("signing", &format!("{:02x?}...", signing_preview))
+            .field("kem", &format!("{:02x?}...", kem_preview))
+            .finish()
+    }
+}
+
+impl PublicKey {
+    /// Get the raw bytes of the signing public key
+    ///
+    /// Useful for comparing sender identities or storing in a directory.
+    pub fn signing_bytes(&self) -> &[u8] {
+        &self.signing.0
+    }
+
+    /// Get the raw bytes of the KEM public key
+    ///
+    /// Useful for serialization or directory storage.
+    pub fn kem_bytes(&self) -> &[u8] {
+        &self.kem.0
+    }
+}
+
 /// Signing keypair (ML-DSA-65)
 #[derive(Clone)]
 pub(crate) struct SigningKeyPair {

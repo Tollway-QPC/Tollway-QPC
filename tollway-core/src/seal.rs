@@ -19,7 +19,7 @@ pub fn seal(
     let ephemeral_kem = kem::generate_ephemeral_keypair()?;
 
     // Sign ephemeral public key with sender's long-term signing key
-    let signature = signature::sign(&ephemeral_kem.public.0, &sender_keypair.signing.secret)?;
+    let sig = signature::sign(&ephemeral_kem.public.0, &sender_keypair.signing.secret)?;
 
     // Encapsulate to recipient's public KEM key
     let (shared_secret, kem_ciphertext) = kem::encapsulate(&recipient_public_key.kem)?;
@@ -28,8 +28,15 @@ pub fn seal(
     let aead_key = kdf::derive_aead_key(&shared_secret)?;
     let aead_nonce = kdf::derive_aead_nonce(&shared_secret)?;
 
-    // Encrypt plaintext with AEAD
-    let aead_ciphertext = aead::encrypt(&aead_key, &aead_nonce, plaintext)?;
+    // Build AAD: binds ciphertext to sender, recipient, and this specific message
+    let aad = aead::build_aad(
+        &sender_keypair.signing.public.0,
+        &recipient_public_key.kem.0,
+        &ephemeral_kem.public.0,
+    );
+
+    // Encrypt plaintext with AEAD (now with associated data)
+    let aead_ciphertext = aead::encrypt(&aead_key, &aead_nonce, plaintext, &aad)?;
 
     // Zero ephemeral secret key (forward secrecy)
     drop(ephemeral_kem.secret); // ZeroizeOnDrop takes care of this
@@ -37,8 +44,9 @@ pub fn seal(
     // Build wire format
     let ciphertext = format::build_ciphertext(
         &sender_keypair.signing.public,
+        &sender_keypair.kem.public,
         &ephemeral_kem.public,
-        &signature,
+        &sig,
         &kem_ciphertext,
         &aead_ciphertext,
     )?;

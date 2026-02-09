@@ -27,6 +27,7 @@ pub(crate) struct ParsedCiphertext {
 /// Format (V1):
 /// - version: 1 byte
 /// - sender_signing_pk: ML_DSA_65_PUBLIC_KEY_BYTES
+/// - sender_kem_pk: ML_KEM_768_PUBLIC_KEY_BYTES
 /// - ephemeral_kem_pk: ML_KEM_768_PUBLIC_KEY_BYTES
 /// - signature: ML_DSA_65_SIGNATURE_BYTES
 /// - kem_ciphertext: ML_KEM_768_CIPHERTEXT_BYTES
@@ -34,6 +35,7 @@ pub(crate) struct ParsedCiphertext {
 /// - aead_ciphertext: variable length
 pub(crate) fn build_ciphertext(
     sender_signing_pk: &SigningPublicKey,
+    sender_kem_pk: &KEMPublicKey,
     ephemeral_kem_pk: &KEMPublicKey,
     signature: &[u8],
     kem_ciphertext: &[u8],
@@ -43,6 +45,11 @@ pub(crate) fn build_ciphertext(
     if sender_signing_pk.0.len() != ML_DSA_65_PUBLIC_KEY_BYTES {
         return Err(TollwayError::Internal(
             "Invalid sender signing public key size".to_string(),
+        ));
+    }
+    if sender_kem_pk.0.len() != ML_KEM_768_PUBLIC_KEY_BYTES {
+        return Err(TollwayError::Internal(
+            "Invalid sender KEM public key size".to_string(),
         ));
     }
     if ephemeral_kem_pk.0.len() != ML_KEM_768_PUBLIC_KEY_BYTES {
@@ -61,7 +68,8 @@ pub(crate) fn build_ciphertext(
 
     let total_len = 1  // version
         + ML_DSA_65_PUBLIC_KEY_BYTES
-        + ML_KEM_768_PUBLIC_KEY_BYTES
+        + ML_KEM_768_PUBLIC_KEY_BYTES  // sender_kem_pk
+        + ML_KEM_768_PUBLIC_KEY_BYTES  // ephemeral_kem_pk
         + ML_DSA_65_SIGNATURE_BYTES
         + ML_KEM_768_CIPHERTEXT_BYTES
         + 4  // aead_ciphertext length
@@ -74,6 +82,9 @@ pub(crate) fn build_ciphertext(
 
     // Sender signing public key
     output.extend_from_slice(&sender_signing_pk.0);
+
+    // Sender KEM public key (allows recipient to reply)
+    output.extend_from_slice(&sender_kem_pk.0);
 
     // Ephemeral KEM public key
     output.extend_from_slice(&ephemeral_kem_pk.0);
@@ -99,7 +110,8 @@ pub(crate) fn parse_ciphertext(data: &[u8]) -> Result<ParsedCiphertext, TollwayE
     // Minimum size check
     let min_size = 1  // version
         + ML_DSA_65_PUBLIC_KEY_BYTES
-        + ML_KEM_768_PUBLIC_KEY_BYTES
+        + ML_KEM_768_PUBLIC_KEY_BYTES  // sender_kem_pk
+        + ML_KEM_768_PUBLIC_KEY_BYTES  // ephemeral_kem_pk
         + ML_DSA_65_SIGNATURE_BYTES
         + ML_KEM_768_CIPHERTEXT_BYTES
         + 4; // aead_ciphertext length
@@ -122,6 +134,11 @@ pub(crate) fn parse_ciphertext(data: &[u8]) -> Result<ParsedCiphertext, TollwayE
     let sender_signing_public =
         SigningPublicKey(data[offset..offset + ML_DSA_65_PUBLIC_KEY_BYTES].to_vec());
     offset += ML_DSA_65_PUBLIC_KEY_BYTES;
+
+    // Sender KEM public key
+    let sender_kem_public =
+        KEMPublicKey(data[offset..offset + ML_KEM_768_PUBLIC_KEY_BYTES].to_vec());
+    offset += ML_KEM_768_PUBLIC_KEY_BYTES;
 
     // Ephemeral KEM public key
     let ephemeral_kem_public =
@@ -153,10 +170,6 @@ pub(crate) fn parse_ciphertext(data: &[u8]) -> Result<ParsedCiphertext, TollwayE
         return Err(TollwayError::InvalidCiphertext);
     }
     let aead_ciphertext = data[offset..offset + aead_len].to_vec();
-
-    // For V1, sender_kem_public is not included, use a placeholder
-    // In real usage, the sender's KEM public key would be obtained from a directory
-    let sender_kem_public = KEMPublicKey(Vec::new());
 
     Ok(ParsedCiphertext {
         _version: version,

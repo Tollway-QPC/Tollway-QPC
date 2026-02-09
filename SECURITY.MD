@@ -52,6 +52,40 @@ Include:
 
 ## Known Limitations
 
+### Replay Protection
+
+**tollway-core does not provide replay protection.** The same ciphertext can be presented multiple times and will decrypt successfully each time. This is by design:
+
+- Replay protection requires state management (sequence numbers, timestamps, or session tracking)
+- State belongs in the application layer, not the cryptographic primitive layer
+- Different applications have different replay protection needs
+
+**If your application needs replay protection**, you must implement it yourself:
+
+- Use sequence numbers or timestamps in your protocol
+- Track processed message IDs
+- Implement session management at a higher layer
+- Consider using `tollway-session` (coming in V3.0) for Double Ratchet-based sessions
+
+### Recipient Binding
+
+Ciphertext is bound to a specific recipient via:
+
+- KEM encapsulation to recipient's public key
+- Associated Authenticated Data (AAD) including recipient's public key
+
+An attacker cannot redirect a message to a different recipient.
+
+### Sender Authentication
+
+Sender identity is authenticated via:
+
+- ML-DSA-65 signature over the ephemeral KEM public key
+- Sender's signing public key included in wire format
+- AAD binding includes sender's signing public key
+
+If signature verification fails, `open()` returns an error. There is no way to decrypt a message without verifying the sender.
+
 ### Scope
 
 - Side-channel resistance focuses on software timing attacks

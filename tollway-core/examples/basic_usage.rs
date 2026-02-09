@@ -18,14 +18,14 @@ fn main() {
     println!("Ciphertext length: {} bytes", ciphertext.len());
 
     // Open (decrypt + verify) the message
-    let (decrypted, _sender_pk) = open(&ciphertext, &recipient_keypair).expect("Open failed");
+    let (decrypted, sender_pk) = open(&ciphertext, &recipient_keypair).expect("Open failed");
 
     println!("Decrypted: {:?}", String::from_utf8_lossy(&decrypted));
 
-    // Note: The returned sender_pk only contains the signing public key from the wire format.
-    // The KEM public key field is empty in V1 format (would be obtained from a directory).
-    // Signature verification happens inside open() - if it fails, open() returns an error.
+    // The returned sender_pk contains both signing and KEM public keys
+    // You can use it to send a reply back to the sender
     println!("Sender signature verified: true (open() succeeded)");
+    println!("Can reply to sender: {}", !sender_pk.kem_bytes().is_empty());
 
     assert_eq!(plaintext.as_slice(), decrypted.as_slice());
     println!("Success: Message round-tripped correctly!");
