@@ -20,7 +20,7 @@ categories = ["cryptography", "authentication"]
 
 [workspace.dependencies]
 # Post-quantum cryptography primitives
-pqcrypto = { version = "0.18.1", features = ["all"] }
+pqcrypto = "0.18.1"
 
 # Symmetric cryptography
 chacha20poly1305 = "0.10"
@@ -29,13 +29,13 @@ sha3 = "0.10"
 
 # Utilities
 zeroize = { version = "1.7", features = ["derive"] }
-rand = "0.9.2"
+rand = "0.10.0"
 thiserror = "2.0.18"
 serde = { version = "1.0", features = ["derive"] }
 bincode = "3.0"
 
 # Async (for future)
-tokio = { version = "1", features = ["full"], optional = true }
+tokio = { version = "1", features = ["full"] }
 
 # Logging and observability
 tracing = "0.1"

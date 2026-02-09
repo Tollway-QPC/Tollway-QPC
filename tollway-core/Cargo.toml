@@ -12,8 +12,7 @@ description = "Post-quantum cryptographic primitives with forward secrecy and au
 
 [dependencies]
 #PQ Primatives
-pqcrypto-kem.workspace = true
-pqcrypto-sign.workspace = true
+pqcrypto.workspace = true
 
 # Symmetric Primitives
 chacha20poly1305 = "0.10"
@@ -27,7 +26,7 @@ thiserror.workspace = true
 serde = { workspace = true, optional = true }
 
 [dev-dependencies]
-crtierion.workspace = true
+criterion.workspace = true
 quickcheck.workspace = true
 proptest.workspace = true
 hex = "0.4"
