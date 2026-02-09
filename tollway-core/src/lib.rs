@@ -4,7 +4,7 @@
 //! Built on NIST-standardized algorithms: ML-KEM-768, ML-DSA-65, ChaCha20-Poly1305.
 
 #![forbid(unsafe_code)]
-#![warn(missing_docs, rust_2018_idioms, missing_copy_implementations, bad-style, unused, rust_2024_compatibility)]
+#![warn(missing_docs, rust_2018_idioms, missing_copy_implementations, non_camel_case_types, unused, rust_2024_compatibility)]
 
 pub mod constants;
 pub mod error;

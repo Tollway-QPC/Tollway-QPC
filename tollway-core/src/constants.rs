@@ -28,9 +28,9 @@ pub const ML_KEM_768_SECRET_KEY_BYTES: usize = 2400;
 pub const ML_KEM_768_CIPHERTEXT_BYTES: usize = 1088;
 pub const ML_KEM_768_SHARED_SECRET_BYTES: usize = 32;
 
-// ML-DSA-65 sizes
-pub const ML_DSA_65_PUBLIC_KEY_BYTES: usize = 2592;
-pub const ML_DSA_65_SECRET_KEY_BYTES: usize = 4864;
+// ML-DSA-65 sizes (from pqcrypto-mldsa)
+pub const ML_DSA_65_PUBLIC_KEY_BYTES: usize = 1952;
+pub const ML_DSA_65_SECRET_KEY_BYTES: usize = 4032;
 pub const ML_DSA_65_SIGNATURE_BYTES: usize = 3309;
 
 // ChaCha20-Poly1305 sizes

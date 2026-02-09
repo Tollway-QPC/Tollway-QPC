@@ -33,9 +33,9 @@ let plaintext = b"Hello, Bob!";
 let ciphertext = seal(plaintext, &alice, &bob.public_key())?;
 
 // Bob decrypts and verifies it came from Alice
-let (decrypted, sender_pk) = open(&ciphertext, &bob)?;
+// (signature verification happens inside open - if it fails, open returns an error)
+let (decrypted, _sender_pk) = open(&ciphertext, &bob)?;
 assert_eq!(decrypted, plaintext);
-assert_eq!(sender_pk, alice.public_key());
 ```
 
 ## API

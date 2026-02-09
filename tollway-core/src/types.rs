@@ -4,9 +4,12 @@
 // PublicKey { signing: SigningPublicKey, kem: KEMPublicKey }
 // SecretKey (internal, never exposed directly)
 // Ciphertext { version, sender_signing_pk, signed_ephemeral_pk, kem_ciphertext, aead_ciphertext }
-// implements: Clone (public keys only), Zeroize (secret keys), Serialize/Deserialize
+// implements: Clone (public keys only), Zeroize (secret keys), Serialize/Deserializ
 
-use crate::error::TollwayError;
+use pqcrypto::kem::mlkem768;
+use pqcrypto::sign::mldsa65;
+use pqcrypto::traits::kem::{PublicKey as KemPk, SecretKey as KemSk};
+use pqcrypto::traits::sign::{PublicKey as SignPk, SecretKey as SignSk};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// A complete keypair containing both signing and KEM keys
@@ -18,15 +21,33 @@ pub struct KeyPair {
 
 impl KeyPair {
     /// Generate a new random keypair
-
+    ///
     /// Uses cryptographically secure randomness for both signing and KEM keys.
     pub fn generate() -> Self {
-        todo!("Implementation: Generate ML-DSA-65 and ML-KEM-768 keypairs")
+        // Generate ML-DSA-65 signing keypair
+        let (sign_pk, sign_sk) = mldsa65::keypair();
+
+        // Generate ML-KEM-768 KEM keypair
+        let (kem_pk, kem_sk) = mlkem768::keypair();
+
+        Self {
+            signing: SigningKeyPair {
+                public: SigningPublicKey(sign_pk.as_bytes().to_vec()),
+                secret: SigningSecretKey(sign_sk.as_bytes().to_vec()),
+            },
+            kem: KEMKeyPair {
+                public: KEMPublicKey(kem_pk.as_bytes().to_vec()),
+                secret: KEMSecretKey(kem_sk.as_bytes().to_vec()),
+            },
+        }
     }
 
     /// Get the public key component
     pub fn public_key(&self) -> PublicKey {
-        todo!("Implementation: Extract public keys")
+        PublicKey {
+            signing: self.signing.public.clone(),
+            kem: self.kem.public.clone(),
+        }
     }
 }
 

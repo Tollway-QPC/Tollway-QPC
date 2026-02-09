@@ -4,10 +4,8 @@
 // flow: generate_ephemeral_kem_keypair → sign_ephemeral_pk → encapsulate → derive_aead_key → encrypt → zero_ephemeral_secret → build_ciphertext
 
 use crate::{
-    constants::*,
     error::TollwayError,
     primitives::{aead, kdf, kem, signature},
-    secure::memory::SecretBytes,
     types::{KeyPair, PublicKey},
     wire::format,
 };

@@ -88,4 +88,4 @@ Future versions may upgrade algorithms as cryptanalysis progresses.
 ## Security Contact
 
 **Email**: security@tollway.net 
-**PGP Key**: E75F 6D7D 1DFF 2292 D7F5 4A06 292E 43D9 C84E 61DF
+**PGP Key**: D0FF 1D03 4BDD 9749 1577 68B6 7723 71BD 4066 1DF0
