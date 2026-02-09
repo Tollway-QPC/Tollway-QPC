@@ -1,3 +1,21 @@
+//! Core cryptographic types for Tollway-Core.
+//!
+//! This module provides the fundamental cryptographic types used throughout Tollway-Core:
+//!
+//! - [`KeyPair`] - Complete keypair containing both signing and KEM keys
+//! - [`PublicKey`] - Public portion of a keypair for encryption and verification
+//!
+//! # Key Components
+//!
+//! Each keypair contains two sub-components:
+//! - **Signing keys** (ML-DSA-65): Used for digital signatures and authentication
+//! - **KEM keys** (ML-KEM-768): Used for key encapsulation and encryption
+//!
+//! # Security
+//!
+//! Secret keys implement [`Zeroize`] and [`ZeroizeOnDrop`] to ensure sensitive
+//! material is cleared from memory when no longer needed.
+
 // types.rs - Core cryptographic types
 
 // KeyPair { signing: SigningKeyPair, kem: KEMKeyPair }

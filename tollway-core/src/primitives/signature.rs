@@ -13,6 +13,7 @@ use crate::error::TollwayError;
 use crate::types::{SigningKeyPair, SigningPublicKey, SigningSecretKey};
 
 /// Generate a long-term signing keypair
+#[allow(dead_code)]
 pub(crate) fn generate_keypair() -> Result<SigningKeyPair, TollwayError> {
     let (pk, sk) = mldsa65::keypair();
 

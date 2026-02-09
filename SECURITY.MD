@@ -11,9 +11,10 @@
 
 **Do not report security vulnerabilities through public GitHub issues!!**
 
-Send reports to: **security@tollway.net**
+Send reports to: <security@tollway.net>
 
 Include:
+
 - Description of the vulnerability
 - Affected versions
 - Steps to reproduce
@@ -87,5 +88,6 @@ Future versions may upgrade algorithms as cryptanalysis progresses.
 
 ## Security Contact
 
-**Email**: security@tollway.net 
+**Email**: <security@tollway.net>
+
 **PGP Key**: D0FF 1D03 4BDD 9749 1577 68B6 7723 71BD 4066 1DF0

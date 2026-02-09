@@ -13,7 +13,7 @@ use crate::types::{KEMPublicKey, SigningPublicKey};
 
 /// Parsed ciphertext structure
 pub(crate) struct ParsedCiphertext {
-    pub(crate) version: u8,
+    pub(crate) _version: u8,
     pub(crate) sender_signing_public: SigningPublicKey,
     pub(crate) sender_kem_public: KEMPublicKey,
     pub(crate) ephemeral_kem_public: KEMPublicKey,
@@ -159,7 +159,7 @@ pub(crate) fn parse_ciphertext(data: &[u8]) -> Result<ParsedCiphertext, TollwayE
     let sender_kem_public = KEMPublicKey(Vec::new());
 
     Ok(ParsedCiphertext {
-        version,
+        _version: version,
         sender_signing_public,
         sender_kem_public,
         ephemeral_kem_public,

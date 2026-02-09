@@ -30,6 +30,7 @@ pub(crate) fn generate_ephemeral_keypair() -> Result<EphemeralKEMKeyPair, Tollwa
 }
 
 /// Generate a long-term KEM keypair
+#[allow(dead_code)]
 pub(crate) fn generate_keypair() -> Result<KEMKeyPair, TollwayError> {
     let (pk, sk) = mlkem768::keypair();
 

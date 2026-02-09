@@ -4,7 +4,14 @@
 //! Built on NIST-standardized algorithms: ML-KEM-768, ML-DSA-65, ChaCha20-Poly1305.
 
 #![forbid(unsafe_code)]
-#![warn(missing_docs, rust_2018_idioms, missing_copy_implementations, non_camel_case_types, unused, rust_2024_compatibility)]
+#![warn(
+    missing_docs,
+    rust_2018_idioms,
+    missing_copy_implementations,
+    non_camel_case_types,
+    unused,
+    rust_2024_compatibility
+)]
 
 pub mod constants;
 pub mod error;
@@ -19,6 +26,9 @@ mod seal;
 pub use error::TollwayError;
 pub use types::{KeyPair, PublicKey};
 
+/// Encrypts plaintext using post-quantum cryptography with authentication.
+/// Seals the plaintext for the recipient using the sender's keypair for authentication
+/// and the recipient's public key for encryption.
 pub fn seal(
     plaintext: &[u8],
     sender_keypair: &KeyPair,
@@ -27,6 +37,9 @@ pub fn seal(
     seal::seal(plaintext, sender_keypair, recipient_public_key)
 }
 
+/// Decrypts ciphertext using post-quantum cryptography with authentication.
+/// Opens the ciphertext using the recipient's keypair and returns the plaintext
+/// along with the sender's public key for identity verification.
 pub fn open(
     ciphertext: &[u8],
     recipient_keypair: &KeyPair,
