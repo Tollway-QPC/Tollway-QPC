@@ -1,0 +1,37 @@
+[package]
+name = "tollway-core-fuzz"
+version = "0.0.0"
+authors = ["Tollway Contributors"]
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1", features = ["derive"] }
+
+[dependencies.tollway-core]
+path = ".."
+
+[[bin]]
+name = "fuzz_parse_ciphertext"
+path = "fuzz_targets/fuzz_parse_ciphertext.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_seal_open"
+path = "fuzz_targets/fuzz_seal_open.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_corrupted_ct"
+path = "fuzz_targets/fuzz_corrupted_ct.rs"
+test = false
+doc = false
+bench = false
