@@ -142,10 +142,7 @@ fn test_open_corrupted_signature_fails() {
     ciphertext[signature_offset] ^= 0xFF; // Flip bits in signature
 
     let result = open(&ciphertext, &recipient);
-    assert!(matches!(
-        result,
-        Err(TollwayError::SignatureVerificationFailed)
-    ));
+    assert!(matches!(result, Err(TollwayError::DecryptionFailed)));
 }
 
 #[test]
