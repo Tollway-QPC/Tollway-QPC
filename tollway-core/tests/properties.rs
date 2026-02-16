@@ -77,9 +77,7 @@ proptest! {
         // Verify it's a clean error, not a panic
         match result.unwrap_err() {
             TollwayError::InvalidCiphertext
-            | TollwayError::SignatureVerificationFailed
-            | TollwayError::DecryptionFailed
-            | TollwayError::KEMDecapsulationFailed => {}
+            | TollwayError::DecryptionFailed => {}
             e => prop_assert!(false, "Unexpected error type: {:?}", e),
         }
     }
