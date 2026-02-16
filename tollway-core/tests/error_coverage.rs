@@ -92,11 +92,11 @@ fn error_invalid_ciphertext_garbage() {
 }
 
 // =============================================================================
-// ERROR VARIANT: SignatureVerificationFailed
+// ERROR VARIANT: Signature corruption → DecryptionFailed (unified error)
 // =============================================================================
 
 #[test]
-fn error_signature_verification_failed() {
+fn error_signature_corruption_detected() {
     let sender = KeyPair::generate();
     let recipient = KeyPair::generate();
 
@@ -109,12 +109,14 @@ fn error_signature_verification_failed() {
 
     let result = open(&ciphertext, &recipient);
 
+    // open() returns unified DecryptionFailed to prevent timing oracle —
+    // callers cannot distinguish signature failure from AEAD failure.
     match result {
-        Err(TollwayError::SignatureVerificationFailed) => {
-            let err = TollwayError::SignatureVerificationFailed;
-            assert_eq!(err.to_string(), "Signature verification failed");
+        Err(TollwayError::DecryptionFailed) => {
+            let err = TollwayError::DecryptionFailed;
+            assert_eq!(err.to_string(), "Decryption failed");
         }
-        Err(e) => panic!("Expected SignatureVerificationFailed, got {:?}", e),
+        Err(e) => panic!("Expected DecryptionFailed, got {:?}", e),
         Ok(_) => panic!("Expected error, got success"),
     }
 }
@@ -135,9 +137,10 @@ fn error_signature_wrong_sender_key() {
 
     let result = open(&tampered, &recipient);
 
+    // open() returns unified DecryptionFailed to prevent timing oracle
     match result {
-        Err(TollwayError::SignatureVerificationFailed) => {}
-        Err(e) => panic!("Expected SignatureVerificationFailed, got {:?}", e),
+        Err(TollwayError::DecryptionFailed) => {}
+        Err(e) => panic!("Expected DecryptionFailed, got {:?}", e),
         Ok(_) => panic!("Expected error, got success"),
     }
 }
@@ -186,13 +189,10 @@ fn error_decryption_failed_wrong_recipient() {
 
     let result = open(&ciphertext, &wrong_recipient);
 
-    // Could be DecryptionFailed or KEMDecapsulationFailed depending on implementation
+    // open() now maps all crypto failures to unified DecryptionFailed
     assert!(
-        matches!(
-            result,
-            Err(TollwayError::DecryptionFailed) | Err(TollwayError::KEMDecapsulationFailed)
-        ),
-        "Expected decryption error, got {:?}",
+        matches!(result, Err(TollwayError::DecryptionFailed)),
+        "Expected DecryptionFailed, got {:?}",
         result
     );
 }
@@ -316,10 +316,10 @@ fn no_panic_on_all_error_scenarios() {
 fn error_coverage_documentation() {
     println!("Error Variant Coverage:");
     println!("  InvalidCiphertext        - Triggerable via open() with malformed data");
-    println!("  SignatureVerificationFailed - Triggerable via open() with bad signature");
-    println!("  DecryptionFailed         - Triggerable via open() with corrupted AEAD");
+    println!("  SignatureVerificationFailed - Exists in enum but open() maps to DecryptionFailed");
+    println!("  DecryptionFailed         - Triggerable via open() for any crypto failure (sig, KEM, AEAD)");
     println!("  KeyGenerationFailed      - Should never occur with working RNG");
     println!("  KEMEncapsulationFailed   - Should never occur with valid public key");
-    println!("  KEMDecapsulationFailed   - Triggerable via open() with corrupted KEM ct");
+    println!("  KEMDecapsulationFailed   - Exists in enum but open() maps to DecryptionFailed");
     println!("  Internal                 - Should never reach user in normal operation");
 }
