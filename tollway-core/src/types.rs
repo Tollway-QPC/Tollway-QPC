@@ -34,7 +34,12 @@ use crate::error::TollwayError;
 use crate::wire::serialize;
 
 /// A complete keypair containing both signing and KEM keys
-#[derive(Clone)]
+///
+/// `KeyPair` intentionally does **not** implement [`Clone`].  Cloning would
+/// create an untracked copy of secret key material, violating CSP isolation
+/// requirements and widening the window for memory extraction attacks.
+///
+/// Use [`KeyPair::public_key()`] to obtain a cloneable [`PublicKey`].
 pub struct KeyPair {
     pub(crate) signing: SigningKeyPair,
     pub(crate) kem: KEMKeyPair,
@@ -158,7 +163,6 @@ impl PublicKey {
 }
 
 /// Signing keypair (ML-DSA-65)
-#[derive(Clone)]
 pub(crate) struct SigningKeyPair {
     pub(crate) public: SigningPublicKey,
     pub(crate) secret: SigningSecretKey,
@@ -169,11 +173,10 @@ pub(crate) struct SigningKeyPair {
 pub(crate) struct SigningPublicKey(pub(crate) Vec<u8>);
 
 /// Signing secret key (zeroized on drop)
-#[derive(Clone, Zeroize, ZeroizeOnDrop)]
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub(crate) struct SigningSecretKey(pub(crate) Vec<u8>);
 
 /// KEM keypair (ML-KEM-768)
-#[derive(Clone)]
 pub(crate) struct KEMKeyPair {
     pub(crate) public: KEMPublicKey,
     pub(crate) secret: KEMSecretKey,
@@ -184,5 +187,5 @@ pub(crate) struct KEMKeyPair {
 pub(crate) struct KEMPublicKey(pub(crate) Vec<u8>);
 
 /// KEM secret key (zeroized on drop)
-#[derive(Clone, Zeroize, ZeroizeOnDrop)]
+#[derive(Zeroize, ZeroizeOnDrop)]
 pub(crate) struct KEMSecretKey(pub(crate) Vec<u8>);
