@@ -15,22 +15,13 @@ struct CorruptionInput {
     corrupt_count: u8,
 }
 
-// Pre-generate keypairs for better fuzzing throughput
-static mut SENDER: Option<KeyPair> = None;
-static mut RECIPIENT: Option<KeyPair> = None;
+use std::sync::LazyLock;
 
-fn get_keypairs() -> (&'static KeyPair, &'static KeyPair) {
-    unsafe {
-        if SENDER.is_none() {
-            SENDER = Some(KeyPair::generate());
-            RECIPIENT = Some(KeyPair::generate());
-        }
-        (SENDER.as_ref().unwrap(), RECIPIENT.as_ref().unwrap())
-    }
-}
+static SENDER: LazyLock<KeyPair> = LazyLock::new(KeyPair::generate);
+static RECIPIENT: LazyLock<KeyPair> = LazyLock::new(KeyPair::generate);
 
 fuzz_target!(|input: CorruptionInput| {
-    let (sender, recipient) = get_keypairs();
+    let (sender, recipient) = (&*SENDER, &*RECIPIENT);
     
     // Limit plaintext size
     let plaintext = if input.plaintext.is_empty() {

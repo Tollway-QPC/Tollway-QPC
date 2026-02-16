@@ -3,23 +3,14 @@
 use libfuzzer_sys::fuzz_target;
 use tollway_core::{open, KeyPair};
 
-// Static recipient keypair for consistent testing
-// Using lazy_static equivalent via once_cell pattern
-static mut RECIPIENT: Option<KeyPair> = None;
+use std::sync::LazyLock;
 
-fn get_recipient() -> &'static KeyPair {
-    unsafe {
-        if RECIPIENT.is_none() {
-            RECIPIENT = Some(KeyPair::generate());
-        }
-        RECIPIENT.as_ref().unwrap()
-    }
-}
+static RECIPIENT: LazyLock<KeyPair> = LazyLock::new(KeyPair::generate);
 
 fuzz_target!(|data: &[u8]| {
     // Throw arbitrary bytes at the ciphertext parser
     // This should NEVER panic - it should return Err cleanly
-    let recipient = get_recipient();
+    let recipient = &*RECIPIENT;
 
     // The open function internally calls parse_ciphertext
     // Any input should result in either:
