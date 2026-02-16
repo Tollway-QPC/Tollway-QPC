@@ -7,4 +7,4 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-tollway-core = "1.0.0"
+tollway-core = "1.1.0"

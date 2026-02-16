@@ -1,8 +1,8 @@
 # Tollway-PQC Roadmap
 
-## V1.0 - Foundation (Current)
+## V1.0 - Foundation (Complete)
 
-**Status**: In development
+**Status**: Released
 
 **Scope**:
 
@@ -24,7 +24,7 @@
 
 ---
 
-## V1.1 - Performance & Observability (Q2 2026)
+## V1.1 - Performance & Observability (Current)
 
 **Performance**:
 

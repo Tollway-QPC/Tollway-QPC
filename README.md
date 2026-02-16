@@ -31,7 +31,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-tollway-core = "1.0"
+tollway-core = "1.1"
 ```
 
 ## Usage

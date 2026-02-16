@@ -4,6 +4,7 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 1.1.x   | :white_check_mark: |
 | 1.0.x   | :white_check_mark: |
 | < 1.0   | :x:                |
 
@@ -116,6 +117,7 @@ Future versions may upgrade algorithms as cryptanalysis progresses.
 
 ## Audit Status
 
+- **V1.1**: Current release (Feb 2026)
 - **V1.0**: Internal security review (Q1 2026)
 - **External audit**: Planned (Q2 2026)
 - **Formal verification**: Planned for core primitives (2026-2027)

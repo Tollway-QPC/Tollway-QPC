@@ -29,7 +29,7 @@ See [SECURITY.md](../SECURITY.md) for vulnerability reporting.
 
 ```toml
 [dependencies]
-tollway-core = "1.0"
+tollway-core = "1.1"
 ```
 
 ## Usage

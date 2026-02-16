@@ -1,6 +1,6 @@
 # Tollway-PQC Protocol Specification
 
-**Version**: 1.0  
+**Version**: 1.1  
 **Status**: Experimental  
 **Last Updated**: February 2026
 
@@ -387,6 +387,7 @@ For systems migrating from RSA/ECDSA/ECDH:
 
 | Version | Date     | Changes               |
 |---------|----------|-----------------------|
+| 1.1     | Feb 2026 | Version bump, no protocol changes |
 | 1.0     | Feb 2026 | Initial specification |
 
 ---
