@@ -15,18 +15,21 @@ pub fn open(
     ciphertext: &[u8],
     recipient_keypair: &KeyPair,
 ) -> Result<(Vec<u8>, PublicKey), TollwayError> {
-    // Parse wire format
+    // Parse wire format (structural check — no secret information, early-exit is safe)
     let parsed = format::parse_ciphertext(ciphertext)?;
 
     // Verify signature on ephemeral public key
-    signature::verify(
+    // Capture result as bool — do NOT early-exit, to prevent timing oracle
+    let sig_ok = signature::verify(
         &parsed.ephemeral_kem_public.0,
         &parsed.signature,
         &parsed.sender_signing_public,
-    )?;
+    )
+    .is_ok();
 
-    // Decapsulate KEM ciphertext
-    let shared_secret = kem::decapsulate(&parsed.kem_ciphertext, &recipient_keypair.kem.secret)?;
+    // Decapsulate KEM ciphertext (unified error hides which step failed)
+    let shared_secret = kem::decapsulate(&parsed.kem_ciphertext, &recipient_keypair.kem.secret)
+        .map_err(|_| TollwayError::DecryptionFailed)?;
 
     // Derive AEAD key and nonce
     let aead_key = kdf::derive_aead_key(&shared_secret)?;
@@ -47,14 +50,19 @@ pub fn open(
         &parsed.ephemeral_kem_public.0,
     );
 
-    // Decrypt and verify AEAD (with associated data)
-    let plaintext = aead::decrypt(&aead_key, &aead_nonce, &parsed.aead_ciphertext, &aad)?;
+    // Decrypt and verify AEAD (capture result — do NOT early-exit)
+    let aead_result = aead::decrypt(&aead_key, &aead_nonce, &parsed.aead_ciphertext, &aad);
 
-    // Return plaintext and verified sender public key
+    // Unified result: ALL crypto steps must succeed, otherwise return DecryptionFailed.
+    // This eliminates the timing oracle — an attacker cannot distinguish signature
+    // failure from AEAD failure by measuring response time.
     let sender_pk = PublicKey {
         signing: parsed.sender_signing_public,
         kem: parsed.sender_kem_public,
     };
 
-    Ok((plaintext, sender_pk))
+    match (sig_ok, aead_result) {
+        (true, Ok(plaintext)) => Ok((plaintext, sender_pk)),
+        _ => Err(TollwayError::DecryptionFailed),
+    }
 }
