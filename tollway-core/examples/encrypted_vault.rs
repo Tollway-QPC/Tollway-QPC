@@ -281,9 +281,7 @@ fn rotate_keys() -> io::Result<()> {
             Ok((plaintext, _)) => {
                 // Re-encrypt with new key
                 let new_ciphertext = seal(&plaintext, &new_keypair, &new_keypair.public_key())
-                    .map_err(|e| {
-                        io::Error::other(format!("Re-encryption failed: {:?}", e))
-                    })?;
+                    .map_err(|e| io::Error::other(format!("Re-encryption failed: {:?}", e)))?;
 
                 fs::write(&value_path, &new_ciphertext)?;
                 rotated += 1;
