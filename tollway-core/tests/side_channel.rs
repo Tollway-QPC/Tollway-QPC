@@ -308,10 +308,11 @@ fn test_keypair_memory_does_not_persist() {
 // DOCUMENTATION OF CONSTANT-TIME CLAIMS
 // =============================================================================
 
-/// This module documents which operations are claimed to be constant-time
-/// and which are not. This serves as a reference for security auditors.
 #[allow(dead_code)]
 mod constant_time_claims {
+    //! This module documents which operations are claimed to be constant-time
+    //! and which are not. This serves as a reference for security auditors.
+    //!
     //! # Constant-Time Operations (claimed)
     //!
     //! ## Signature (ML-DSA-65)

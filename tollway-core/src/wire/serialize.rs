@@ -1,6 +1,6 @@
 //! Key serialization and deserialization.
 //!
-//! Provides wire-format encoding for [`PublicKey`] and [`KeyPair`] types,
+//! Provides wire-format encoding for [`crate::PublicKey`] and [`crate::KeyPair`] types,
 //! enabling key persistence, sharing, and backup.
 //!
 //! # Wire Formats
@@ -27,7 +27,7 @@
 //!
 //! # Security
 //!
-//! - [`KeyPair`] serialization exports secret key material in the clear.
+//! - [`crate::KeyPair`] serialization exports secret key material in the clear.
 //!   Callers are responsible for encrypting the output before storage.
 //! - Methods that handle secret material are prefixed with `dangerous_` to
 //!   signal that the caller must protect the returned bytes.

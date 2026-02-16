@@ -179,7 +179,7 @@ fn put_value(key: &str, value: &str) -> io::Result<()> {
 
     // Encrypt value to ourselves (self-encryption)
     let ciphertext = seal(value.as_bytes(), &keypair, &keypair.public_key())
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Encryption failed: {:?}", e)))?;
+        .map_err(|e| io::Error::other(format!("Encryption failed: {:?}", e)))?;
 
     // Save encrypted value
     let value_path = values_dir().join(format!("{}.enc", key));
@@ -210,7 +210,7 @@ fn get_value(key: &str) -> io::Result<()> {
 
     // Decrypt
     let (plaintext, _sender) = open(&ciphertext, &keypair)
-        .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("Decryption failed: {:?}", e)))?;
+        .map_err(|e| io::Error::other(format!("Decryption failed: {:?}", e)))?;
 
     let value = String::from_utf8(plaintext).map_err(|e| {
         io::Error::new(
@@ -282,10 +282,7 @@ fn rotate_keys() -> io::Result<()> {
                 // Re-encrypt with new key
                 let new_ciphertext = seal(&plaintext, &new_keypair, &new_keypair.public_key())
                     .map_err(|e| {
-                        io::Error::new(
-                            io::ErrorKind::Other,
-                            format!("Re-encryption failed: {:?}", e),
-                        )
+                        io::Error::other(format!("Re-encryption failed: {:?}", e))
                     })?;
 
                 fs::write(&value_path, &new_ciphertext)?;

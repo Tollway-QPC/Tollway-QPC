@@ -157,30 +157,6 @@ fn bench_components(c: &mut Criterion) {
 }
 
 // =============================================================================
-// RSA-2048 COMPARISON CONTEXT
-// =============================================================================
-
-/// This function prints comparison context for RSA-2048 as a baseline.
-/// Actual RSA benchmarks require an RSA crate, so we provide reference numbers.
-fn print_comparison_table() {
-    println!("\n=== BENCHMARK COMPARISON TABLE (for README) ===\n");
-    println!("| Operation | Tollway-PQC | RSA-2048 (ref) | PQC Tax |");
-    println!("|-----------|-------------|----------------|---------|");
-    println!("| Key Generation | ~15ms | ~150ms | 0.1x |");
-    println!("| Encrypt 1KB | ~1.5ms | ~0.5ms | 3x |");
-    println!("| Decrypt 1KB | ~1.0ms | ~5ms | 0.2x |");
-    println!("| Public Key Size | 3,136 B | 256 B | 12x |");
-    println!("| Ciphertext Overhead | 8,738 B | 256 B | 34x |");
-    println!("| Signature Size | 3,309 B | 256 B | 13x |");
-    println!("\nNotes:");
-    println!("- RSA-2048 numbers are approximate references from OpenSSL benchmarks");
-    println!("- 'PQC Tax' = Tollway time / RSA time (lower is better for PQC)");
-    println!("- ML-KEM-768 key generation is faster than RSA");
-    println!("- Bulk encryption cost dominated by ChaCha20-Poly1305 (same as hybrid RSA)");
-    println!("- Size overhead is the main tradeoff for quantum resistance");
-}
-
-// =============================================================================
 // CRITERION CONFIGURATION
 // =============================================================================
 
