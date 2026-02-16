@@ -8,3 +8,7 @@ pub mod kdf;
 pub mod kem;
 /// Signature primitives
 pub mod signature;
+
+/// AES-256-GCM AEAD primitives (FIPS-approved)
+#[cfg(feature = "fips")]
+pub mod aead_aes;
