@@ -1,10 +1,3 @@
-// primitives/aead.rs - ChaCha20-Poly1305 operations
-
-// encrypt(key, nonce, plaintext, associated_data) → ciphertext
-// decrypt(key, nonce, ciphertext, associated_data) → plaintext
-// wraps: chacha20poly1305 crate
-// ensures: unique nonces (random generation), auth tag verification
-
 use chacha20poly1305::{
     aead::{Aead, KeyInit, Payload},
     ChaCha20Poly1305, Nonce,

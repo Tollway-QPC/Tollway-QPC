@@ -16,14 +16,6 @@
 //! Secret keys implement [`Zeroize`] and [`ZeroizeOnDrop`] to ensure sensitive
 //! material is cleared from memory when no longer needed.
 
-// types.rs - Core cryptographic types
-
-// KeyPair { signing: SigningKeyPair, kem: KEMKeyPair }
-// PublicKey { signing: SigningPublicKey, kem: KEMPublicKey }
-// SecretKey (internal, never exposed directly)
-// Ciphertext { version, sender_signing_pk, signed_ephemeral_pk, kem_ciphertext, aead_ciphertext }
-// implements: Clone (public keys only), Zeroize (secret keys), Serialize/Deserializ
-
 use pqcrypto::kem::mlkem768;
 use pqcrypto::sign::mldsa65;
 use pqcrypto::traits::kem::{PublicKey as KemPk, SecretKey as KemSk};

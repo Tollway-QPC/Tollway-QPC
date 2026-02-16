@@ -1,9 +1,3 @@
-// wire/format.rs - Ciphertext wire format
-
-// Ciphertext serialization: version || sender_pk || signature || kem_ct || aead_ct
-// versioning: allows algorithm upgrades without breaking compatibility
-// includes: length prefixes, type tags for forward compatibility
-
 use crate::constants::{
     ML_DSA_65_PUBLIC_KEY_BYTES, ML_DSA_65_SIGNATURE_BYTES, ML_KEM_768_CIPHERTEXT_BYTES,
     ML_KEM_768_PUBLIC_KEY_BYTES, TOLLWAY_VERSION_1, TOLLWAY_VERSION_2,
