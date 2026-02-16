@@ -1,5 +1,6 @@
 use hkdf::Hkdf;
 use sha3::Sha3_256;
+use zeroize::Zeroizing;
 
 use crate::constants::{
     CHACHA20_POLY1305_KEY_BYTES, CHACHA20_POLY1305_NONCE_BYTES, HKDF_CONTEXT_AEAD,
@@ -12,9 +13,9 @@ use crate::secure::memory::{SecretBytes, SecretVec};
 pub fn derive_aead_key(
     shared_secret: &SecretVec,
 ) -> Result<SecretBytes<CHACHA20_POLY1305_KEY_BYTES>, TollwayError> {
-    let mut key = [0u8; CHACHA20_POLY1305_KEY_BYTES];
-    derive_key(shared_secret.as_bytes(), HKDF_CONTEXT_AEAD, &mut key)?;
-    Ok(SecretBytes::new(key))
+    let mut key = Zeroizing::new([0u8; CHACHA20_POLY1305_KEY_BYTES]);
+    derive_key(shared_secret.as_bytes(), HKDF_CONTEXT_AEAD, key.as_mut())?;
+    Ok(SecretBytes::new(*key))
 }
 
 /// Derive an AEAD nonce from a shared secret
