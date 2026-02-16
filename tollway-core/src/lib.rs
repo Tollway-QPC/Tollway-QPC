@@ -15,6 +15,8 @@
 
 pub mod constants;
 pub mod error;
+#[cfg(feature = "fips")]
+pub mod fips;
 pub mod primitives;
 pub mod secure;
 pub mod types;
