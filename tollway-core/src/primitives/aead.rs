@@ -68,19 +68,29 @@ pub fn decrypt(
 ///
 /// Binds the ciphertext to:
 /// - Sender's signing public key (who sent this)
+/// - Sender's KEM public key (authenticates reply address -- V2+)
 /// - Recipient's KEM public key (who can decrypt)
 /// - Ephemeral KEM public key (this specific message)
 ///
-/// This prevents cut-and-paste attacks and misbinding.
+/// For V1 backward compatibility, pass `&[]` as `sender_kem_pk` to reproduce
+/// the legacy AAD that omitted the sender KEM key.
+///
+/// This prevents cut-and-paste attacks, misbinding, and (in V2) sender KEM
+/// key substitution attacks.
 pub fn build_aad(
     sender_signing_pk: &[u8],
+    sender_kem_pk: &[u8],
     recipient_kem_pk: &[u8],
     ephemeral_kem_pk: &[u8],
 ) -> Vec<u8> {
     let mut aad = Vec::with_capacity(
-        sender_signing_pk.len() + recipient_kem_pk.len() + ephemeral_kem_pk.len(),
+        sender_signing_pk.len()
+            + sender_kem_pk.len()
+            + recipient_kem_pk.len()
+            + ephemeral_kem_pk.len(),
     );
     aad.extend_from_slice(sender_signing_pk);
+    aad.extend_from_slice(sender_kem_pk);
     aad.extend_from_slice(recipient_kem_pk);
     aad.extend_from_slice(ephemeral_kem_pk);
     aad

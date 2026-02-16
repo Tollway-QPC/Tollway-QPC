@@ -10,6 +10,9 @@
 /// Tollway protocol version 1
 pub const TOLLWAY_VERSION_1: u8 = 0x01;
 
+/// Tollway protocol version 2 (adds sender KEM public key to AAD)
+pub const TOLLWAY_VERSION_2: u8 = 0x02;
+
 /// ML-KEM-768 algorithm identifier
 pub const ML_KEM_768_ID: &str = "ML-KEM-768";
 
@@ -47,6 +50,24 @@ pub const CHACHA20_POLY1305_KEY_BYTES: usize = 32;
 pub const CHACHA20_POLY1305_NONCE_BYTES: usize = 12;
 /// ChaCha20-Poly1305 tag size
 pub const CHACHA20_POLY1305_TAG_BYTES: usize = 16;
+
+// Key serialization constants
+/// Magic bytes for serialized public keys: "TLPK"
+pub const PUBLIC_KEY_MAGIC: [u8; 4] = *b"TLPK";
+/// Magic bytes for serialized keypairs: "TLKP"
+pub const KEYPAIR_MAGIC: [u8; 4] = *b"TLKP";
+/// Key serialization format version
+pub const KEY_SERIALIZATION_VERSION: u8 = 0x01;
+/// Total serialized public key size (magic + version + signing_pk + kem_pk)
+pub const SERIALIZED_PUBLIC_KEY_BYTES: usize =
+    4 + 1 + ML_DSA_65_PUBLIC_KEY_BYTES + ML_KEM_768_PUBLIC_KEY_BYTES;
+/// Total serialized keypair size (magic + version + signing_pk + signing_sk + kem_pk + kem_sk)
+pub const SERIALIZED_KEYPAIR_BYTES: usize = 4
+    + 1
+    + ML_DSA_65_PUBLIC_KEY_BYTES
+    + ML_DSA_65_SECRET_KEY_BYTES
+    + ML_KEM_768_PUBLIC_KEY_BYTES
+    + ML_KEM_768_SECRET_KEY_BYTES;
 
 // HKDF context strings (domain separation)
 /// HKDF context string for AEAD key derivation

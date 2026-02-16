@@ -4,6 +4,7 @@
 // flow: parse_ciphertext → verify_signature → decapsulate → derive_aead_key → decrypt_and_verify → return_with_sender_identity
 
 use crate::{
+    constants::TOLLWAY_VERSION_2,
     error::TollwayError,
     primitives::{aead, kdf, kem, signature},
     types::{KeyPair, PublicKey},
@@ -32,8 +33,16 @@ pub fn open(
     let aead_nonce = kdf::derive_aead_nonce(&shared_secret)?;
 
     // Rebuild AAD: must match exactly what was used during seal()
+    // V2: sender KEM key is included in AAD (prevents substitution attacks)
+    // V1: sender KEM key is omitted from AAD (legacy backward compatibility)
+    let sender_kem_in_aad: &[u8] = if parsed.version == TOLLWAY_VERSION_2 {
+        &parsed.sender_kem_public.0
+    } else {
+        &[]
+    };
     let aad = aead::build_aad(
         &parsed.sender_signing_public.0,
+        sender_kem_in_aad,
         &recipient_keypair.kem.public.0,
         &parsed.ephemeral_kem_public.0,
     );
@@ -42,7 +51,6 @@ pub fn open(
     let plaintext = aead::decrypt(&aead_key, &aead_nonce, &parsed.aead_ciphertext, &aad)?;
 
     // Return plaintext and verified sender public key
-    // Note: sender_kem_public is empty in V1 wire format - only signing key is included
     let sender_pk = PublicKey {
         signing: parsed.sender_signing_public,
         kem: parsed.sender_kem_public,

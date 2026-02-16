@@ -6,14 +6,14 @@
 
 use crate::constants::{
     ML_DSA_65_PUBLIC_KEY_BYTES, ML_DSA_65_SIGNATURE_BYTES, ML_KEM_768_CIPHERTEXT_BYTES,
-    ML_KEM_768_PUBLIC_KEY_BYTES, TOLLWAY_VERSION_1,
+    ML_KEM_768_PUBLIC_KEY_BYTES, TOLLWAY_VERSION_1, TOLLWAY_VERSION_2,
 };
 use crate::error::TollwayError;
 use crate::types::{KEMPublicKey, SigningPublicKey};
 
 /// Parsed ciphertext structure
 pub(crate) struct ParsedCiphertext {
-    pub(crate) _version: u8,
+    pub(crate) version: u8,
     pub(crate) sender_signing_public: SigningPublicKey,
     pub(crate) sender_kem_public: KEMPublicKey,
     pub(crate) ephemeral_kem_public: KEMPublicKey,
@@ -24,8 +24,8 @@ pub(crate) struct ParsedCiphertext {
 
 /// Build the wire format ciphertext
 ///
-/// Format (V1):
-/// - version: 1 byte
+/// Format (V2 -- identical layout to V1, but sender KEM key is now AAD-bound):
+/// - version: 1 byte (0x02)
 /// - sender_signing_pk: ML_DSA_65_PUBLIC_KEY_BYTES
 /// - sender_kem_pk: ML_KEM_768_PUBLIC_KEY_BYTES
 /// - ephemeral_kem_pk: ML_KEM_768_PUBLIC_KEY_BYTES
@@ -77,8 +77,8 @@ pub(crate) fn build_ciphertext(
 
     let mut output = Vec::with_capacity(total_len);
 
-    // Version
-    output.push(TOLLWAY_VERSION_1);
+    // Version (V2: sender KEM key is now authenticated via AAD)
+    output.push(TOLLWAY_VERSION_2);
 
     // Sender signing public key
     output.extend_from_slice(&sender_signing_pk.0);
@@ -96,6 +96,11 @@ pub(crate) fn build_ciphertext(
     output.extend_from_slice(kem_ciphertext);
 
     // AEAD ciphertext length (u32 little-endian)
+    if aead_ciphertext.len() > u32::MAX as usize {
+        return Err(TollwayError::Internal(
+            "AEAD ciphertext too large for wire format".to_string(),
+        ));
+    }
     let aead_len = aead_ciphertext.len() as u32;
     output.extend_from_slice(&aead_len.to_le_bytes());
 
@@ -126,7 +131,7 @@ pub(crate) fn parse_ciphertext(data: &[u8]) -> Result<ParsedCiphertext, TollwayE
     let version = data[offset];
     offset += 1;
 
-    if version != TOLLWAY_VERSION_1 {
+    if version != TOLLWAY_VERSION_1 && version != TOLLWAY_VERSION_2 {
         return Err(TollwayError::InvalidCiphertext);
     }
 
@@ -172,7 +177,7 @@ pub(crate) fn parse_ciphertext(data: &[u8]) -> Result<ParsedCiphertext, TollwayE
     let aead_ciphertext = data[offset..offset + aead_len].to_vec();
 
     Ok(ParsedCiphertext {
-        _version: version,
+        version,
         sender_signing_public,
         sender_kem_public,
         ephemeral_kem_public,

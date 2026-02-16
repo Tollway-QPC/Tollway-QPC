@@ -21,8 +21,8 @@ fn test_vector_wire_format_structure() {
 
     let ciphertext = seal(plaintext, &sender, &recipient.public_key()).unwrap();
 
-    // Version byte should be 0x01
-    assert_eq!(ciphertext[0], 0x01, "Version byte should be 0x01");
+    // Version byte should be 0x02 (V2: sender KEM key authenticated via AAD)
+    assert_eq!(ciphertext[0], 0x02, "Version byte should be 0x02");
 
     // Total size should be header + plaintext + tag
     let expected_header = 1      // version

@@ -190,10 +190,10 @@ fn nist_algorithm_versions() {
     let recipient = KeyPair::generate();
     let ciphertext = seal(b"test", &sender, &recipient.public_key()).unwrap();
 
-    // Version 0x01 = ML-KEM-768 + ML-DSA-65 + ChaCha20-Poly1305
+    // Version 0x02 = ML-KEM-768 + ML-DSA-65 + ChaCha20-Poly1305 (sender KEM key in AAD)
     assert_eq!(
-        ciphertext[0], 0x01,
-        "Version byte should be 0x01 for NIST algorithm suite"
+        ciphertext[0], 0x02,
+        "Version byte should be 0x02 for current NIST algorithm suite"
     );
 }
 

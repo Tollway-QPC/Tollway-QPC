@@ -344,3 +344,29 @@ fn test_aad_binding_prevents_misdirection() {
     let result = open(&ciphertext, &other_recipient);
     assert!(result.is_err());
 }
+
+#[test]
+fn test_sender_kem_key_substitution_detected() {
+    // S1 regression test: an attacker replaces the sender's KEM public key
+    // in the ciphertext with their own. In V2, this is detected because the
+    // sender KEM key is bound in the AEAD associated data.
+    let alice = KeyPair::generate();
+    let bob = KeyPair::generate();
+    let attacker = KeyPair::generate();
+    let plaintext = b"Hello Bob!";
+
+    let mut ciphertext = seal(plaintext, &alice, &bob.public_key()).unwrap();
+
+    // Replace sender KEM public key (offset 1953..3137) with attacker's KEM key
+    let sender_kem_offset = 1 + 1952; // version + signing pk
+    let attacker_kem = attacker.public_key();
+    ciphertext[sender_kem_offset..sender_kem_offset + 1184]
+        .copy_from_slice(attacker_kem.kem_bytes());
+
+    // V2 AAD covers sender KEM key, so this substitution should be detected
+    let result = open(&ciphertext, &bob);
+    assert!(
+        result.is_err(),
+        "Sender KEM key substitution must be detected in V2"
+    );
+}

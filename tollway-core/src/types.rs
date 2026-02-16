@@ -30,6 +30,9 @@ use pqcrypto::traits::kem::{PublicKey as KemPk, SecretKey as KemSk};
 use pqcrypto::traits::sign::{PublicKey as SignPk, SecretKey as SignSk};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
+use crate::error::TollwayError;
+use crate::wire::serialize;
+
 /// A complete keypair containing both signing and KEM keys
 #[derive(Clone)]
 pub struct KeyPair {
@@ -67,6 +70,35 @@ impl KeyPair {
             kem: self.kem.public.clone(),
         }
     }
+
+    /// Export the full keypair (including secret keys) to bytes.
+    ///
+    /// # Warning
+    ///
+    /// The returned bytes contain **unencrypted secret key material**.
+    /// You **must** encrypt the output before writing it to disk or
+    /// transmitting it over a network. Failure to do so exposes the
+    /// signing and KEM secret keys to any observer.
+    pub fn dangerous_export(&self) -> Vec<u8> {
+        serialize::serialize_keypair(self)
+    }
+
+    /// Import a keypair from bytes previously produced by
+    /// [`dangerous_export`](KeyPair::dangerous_export).
+    ///
+    /// # Warning
+    ///
+    /// The input must contain **unencrypted** secret key material in the
+    /// Tollway keypair wire format. Callers should decrypt the data
+    /// from a trusted source before calling this method.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TollwayError::InvalidKeyData`] if the magic bytes, version,
+    /// or data length are incorrect.
+    pub fn dangerous_import(data: &[u8]) -> Result<Self, TollwayError> {
+        serialize::deserialize_keypair(data)
+    }
 }
 
 /// Public key (safe to share)
@@ -101,6 +133,27 @@ impl PublicKey {
     /// Useful for serialization or directory storage.
     pub fn kem_bytes(&self) -> &[u8] {
         &self.kem.0
+    }
+
+    /// Serialize this public key to its wire format.
+    ///
+    /// The output is a self-describing byte sequence (magic header + version +
+    /// key material) that can be safely stored or shared out-of-band.
+    ///
+    /// Use [`PublicKey::from_bytes`] to reconstruct the key.
+    pub fn to_bytes(&self) -> Vec<u8> {
+        serialize::serialize_public_key(self)
+    }
+
+    /// Deserialize a public key from bytes previously produced by
+    /// [`to_bytes`](PublicKey::to_bytes).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TollwayError::InvalidKeyData`] if the magic bytes, version,
+    /// or data length are incorrect.
+    pub fn from_bytes(data: &[u8]) -> Result<Self, TollwayError> {
+        serialize::deserialize_public_key(data)
     }
 }
 

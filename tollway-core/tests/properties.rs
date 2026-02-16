@@ -59,22 +59,10 @@ proptest! {
         let ciphertext = seal(&plaintext, &sender, &recipient.public_key())
             .expect("seal should succeed");
 
-        // Corrupt a byte
-        // NOTE: sender_kem_pk (bytes 1953-3136) is NOT protected by AAD/signature
-        // because it's only used for reply capability. Skip that region.
-        let sender_kem_start = 1 + 1952; // after version + signing pk
-        let sender_kem_end = sender_kem_start + 1184;
-
+        // Corrupt a byte -- V2 AAD now covers all fields including sender KEM key,
+        // so corruption at any position should cause open() to fail.
         let mut corrupted = ciphertext.clone();
-        let mut pos = corrupt_pos % corrupted.len();
-
-        // Skip sender_kem_pk region (unprotected by design)
-        if pos >= sender_kem_start && pos < sender_kem_end {
-            pos = sender_kem_end; // Move to ephemeral pk region
-            if pos >= corrupted.len() {
-                pos = 0; // Fall back to version byte
-            }
-        }
+        let pos = corrupt_pos % corrupted.len();
 
         corrupted[pos] ^= corrupt_val;
 

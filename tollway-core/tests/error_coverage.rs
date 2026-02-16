@@ -245,6 +245,7 @@ fn error_all_variants_have_messages() {
         TollwayError::KeyGenerationFailed,
         TollwayError::KEMEncapsulationFailed,
         TollwayError::KEMDecapsulationFailed,
+        TollwayError::InvalidKeyData("context".to_string()),
         TollwayError::Internal("context".to_string()),
     ];
 

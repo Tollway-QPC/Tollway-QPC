@@ -29,8 +29,10 @@ pub fn seal(
     let aead_nonce = kdf::derive_aead_nonce(&shared_secret)?;
 
     // Build AAD: binds ciphertext to sender, recipient, and this specific message
+    // V2: includes sender KEM key to prevent substitution attacks on reply address
     let aad = aead::build_aad(
         &sender_keypair.signing.public.0,
+        &sender_keypair.kem.public.0,
         &recipient_public_key.kem.0,
         &ephemeral_kem.public.0,
     );

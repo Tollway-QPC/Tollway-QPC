@@ -34,6 +34,10 @@ pub enum TollwayError {
     #[error("KEM decapsulation failed")]
     KEMDecapsulationFailed,
 
+    /// Key data is invalid or corrupted (deserialization failure)
+    #[error("Invalid key data: {0}")]
+    InvalidKeyData(String),
+
     /// Internal error (should never happen)
     #[error("Internal error: {0}")]
     Internal(String),
