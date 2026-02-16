@@ -41,4 +41,19 @@ pub enum TollwayError {
     /// Internal error (should never happen)
     #[error("Internal error: {0}")]
     Internal(String),
+
+    /// FIPS self-test failed during module initialization
+    #[cfg(feature = "fips")]
+    #[error("FIPS self-test failed: {0}")]
+    SelfTestFailed(String),
+
+    /// FIPS module has not been initialized; call `fips::initialize()` first
+    #[cfg(feature = "fips")]
+    #[error("FIPS module not initialized")]
+    ModuleNotInitialized,
+
+    /// Operation rejected: algorithm or operation is not FIPS-approved
+    #[cfg(feature = "fips")]
+    #[error("FIPS approved mode violation: {0}")]
+    ApprovedModeViolation(String),
 }
