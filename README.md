@@ -3,15 +3,13 @@
 [![Crates.io](https://img.shields.io/crates/v/tollway-core.svg)](https://crates.io/crates/tollway-core)
 [![Documentation](https://docs.rs/tollway-core/badge.svg)](https://docs.rs/tollway-core)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE-MIT)
-[![Safety Dance](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 A post-quantum cryptography library for authenticated encryption in Rust.
 
 ## Security
 
 > [!WARNING]
-> This library has **not undergone any third-party security audit**. Usage is at **own risk**. Audit scheduled for Q2 2026.
-
+> This library has **not undergone any third-party security audit**. Usage is at **own risk**.
 See [SECURITY.md](SECURITY.md) for vulnerability reporting.
 
 ## Features
@@ -104,12 +102,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ```bash
 cargo test
-```
-
-Fuzz targets are in [`tollway-core/fuzz/`](tollway-core/fuzz/). Timing analysis tests:
-
-```bash
-cargo test --release --test timing_rigorous
 ```
 
 ## Benchmarks
