@@ -1,4 +1,17 @@
-//! Algorithm constants and identifiers
+//! Algorithm constants, protocol versions, and wire format sizes.
+//!
+//! This module centralizes every magic number used by Tollway-Core so that
+//! protocol changes only require updates in one place. Constants are grouped
+//! by subsystem:
+//!
+//! - **Protocol versions** — [`TOLLWAY_VERSION_1`], [`TOLLWAY_VERSION_2`]
+//! - **ML-KEM-768** — Public key, secret key, ciphertext, and shared secret sizes
+//! - **ML-DSA-65** — Public key, secret key, and signature sizes
+//! - **ChaCha20-Poly1305** — Key, nonce, and tag sizes
+//! - **AES-256-GCM** — Key, nonce, and tag sizes (FIPS mode)
+//! - **Key serialization** — Magic bytes, version, and total serialized sizes
+//! - **FIPS state machine** — State codes for the module lifecycle FSM
+//! - **HKDF domain separation** — Context strings for key and nonce derivation
 
 /// Tollway protocol version 1
 pub const TOLLWAY_VERSION_1: u8 = 0x01;
@@ -19,21 +32,21 @@ pub const CHACHA20_POLY1305_ID: &str = "ChaCha20-Poly1305";
 pub const HKDF_SHA3_256_ID: &str = "HKDF-SHA3-256";
 
 // ML-KEM-768 sizes
-/// ML-KEM-768 sizes (from pqcrypto)
+/// Size of an ML-KEM-768 public key in bytes.
 pub const ML_KEM_768_PUBLIC_KEY_BYTES: usize = 1184;
-/// ML-KEM-768 sizes (from pqcrypto)
+/// Size of an ML-KEM-768 secret key in bytes.
 pub const ML_KEM_768_SECRET_KEY_BYTES: usize = 2400;
-/// ML-KEM-768 sizes (from pqcrypto)
+/// Size of an ML-KEM-768 ciphertext (encapsulation output) in bytes.
 pub const ML_KEM_768_CIPHERTEXT_BYTES: usize = 1088;
-/// ML-KEM-768 sizes (from pqcrypto)
+/// Size of an ML-KEM-768 shared secret in bytes.
 pub const ML_KEM_768_SHARED_SECRET_BYTES: usize = 32;
 
-// ML-DSA-65 sizes (from pqcrypto)
-/// ML-DSA-65 sizes (from pqcrypto)
+// ML-DSA-65 sizes
+/// Size of an ML-DSA-65 public key in bytes.
 pub const ML_DSA_65_PUBLIC_KEY_BYTES: usize = 1952;
-/// ML-DSA-65 sizes (from pqcrypto)
+/// Size of an ML-DSA-65 secret key in bytes.
 pub const ML_DSA_65_SECRET_KEY_BYTES: usize = 4032;
-/// ML-DSA-65 sizes (from pqcrypto)
+/// Size of an ML-DSA-65 detached signature in bytes.
 pub const ML_DSA_65_SIGNATURE_BYTES: usize = 3309;
 
 // ChaCha20-Poly1305 sizes

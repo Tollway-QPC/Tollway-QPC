@@ -1,3 +1,12 @@
+//! Key Derivation using HKDF-SHA3-256.
+//!
+//! This module derives AEAD keys and nonces from the ML-KEM shared secret
+//! using HKDF (RFC 5869) instantiated with SHA3-256. Domain-separation
+//! strings (see [`constants::HKDF_CONTEXT_AEAD`](crate::constants::HKDF_CONTEXT_AEAD)
+//! and [`constants::HKDF_CONTEXT_NONCE`](crate::constants::HKDF_CONTEXT_NONCE))
+//! ensure that the key and nonce derivations are cryptographically
+//! independent even when fed the same input key material.
+
 use hkdf::Hkdf;
 use sha3::Sha3_256;
 use zeroize::Zeroizing;
@@ -9,7 +18,17 @@ use crate::constants::{
 use crate::error::TollwayError;
 use crate::secure::memory::{SecretBytes, SecretVec};
 
-/// Derive an AEAD key from a shared secret
+/// Derives a 256-bit AEAD key from a KEM shared secret.
+///
+/// Uses the domain-separation context
+/// [`HKDF_CONTEXT_AEAD`] to ensure
+/// the derived key is independent of the nonce derived by
+/// [`derive_aead_nonce`].
+///
+/// # Errors
+///
+/// Returns [`TollwayError::Internal`] if HKDF expansion fails (should not
+/// occur with valid inputs and a 32-byte output length).
 pub fn derive_aead_key(
     shared_secret: &SecretVec,
 ) -> Result<SecretBytes<CHACHA20_POLY1305_KEY_BYTES>, TollwayError> {
@@ -18,7 +37,16 @@ pub fn derive_aead_key(
     Ok(SecretBytes::new(*key))
 }
 
-/// Derive an AEAD nonce from a shared secret
+/// Derives a 96-bit AEAD nonce from a KEM shared secret.
+///
+/// Uses the domain-separation context
+/// [`HKDF_CONTEXT_NONCE`] to ensure
+/// the derived nonce is independent of the key derived by
+/// [`derive_aead_key`].
+///
+/// # Errors
+///
+/// Returns [`TollwayError::Internal`] if HKDF expansion fails.
 pub fn derive_aead_nonce(
     shared_secret: &SecretVec,
 ) -> Result<[u8; CHACHA20_POLY1305_NONCE_BYTES], TollwayError> {
@@ -27,7 +55,24 @@ pub fn derive_aead_nonce(
     Ok(nonce)
 }
 
-/// Generic key derivation using HKDF-SHA3-256
+/// Low-level HKDF-SHA3-256 key derivation.
+///
+/// Runs the HKDF extract-then-expand flow with an empty salt (HKDF uses
+/// a default zero-filled salt internally) and the provided `info` string
+/// for domain separation.
+///
+/// # Arguments
+///
+/// * `input_key_material` — The raw shared secret from KEM decapsulation.
+/// * `info` — A context/domain-separation string (e.g.,
+///   [`HKDF_CONTEXT_AEAD`]).
+/// * `output` — The buffer to fill with derived key material. Its length
+///   determines how many bytes are produced.
+///
+/// # Errors
+///
+/// Returns [`TollwayError::Internal`] if HKDF expansion fails (e.g.,
+/// requested output length exceeds `255 * HashLen`).
 pub fn derive_key(
     input_key_material: &[u8],
     info: &[u8],

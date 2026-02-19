@@ -38,9 +38,19 @@ pub struct KeyPair {
 }
 
 impl KeyPair {
-    /// Generate a new random keypair
+    /// Generate a new random keypair.
     ///
-    /// Uses cryptographically secure randomness for both signing and KEM keys.
+    /// Creates a fresh ML-DSA-65 signing keypair and ML-KEM-768 KEM keypair
+    /// using cryptographically secure randomness from the operating system.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use tollway_core::KeyPair;
+    ///
+    /// let keypair = KeyPair::generate();
+    /// let public_key = keypair.public_key();
+    /// ```
     pub fn generate() -> Self {
         // Generate ML-DSA-65 signing keypair
         let (sign_pk, sign_sk) = mldsa65::keypair();
@@ -60,7 +70,11 @@ impl KeyPair {
         }
     }
 
-    /// Get the public key component
+    /// Returns the public key component of this keypair.
+    ///
+    /// The returned [`PublicKey`] can be freely shared with communication
+    /// partners. It is used as the `recipient_public_key` argument to
+    /// [`seal`](crate::seal).
     pub fn public_key(&self) -> PublicKey {
         PublicKey {
             signing: self.signing.public.clone(),
@@ -98,7 +112,15 @@ impl KeyPair {
     }
 }
 
-/// Public key (safe to share)
+/// The public portion of a [`KeyPair`], safe to share with others.
+///
+/// Contains the ML-DSA-65 signing public key and the ML-KEM-768 KEM public
+/// key. A `PublicKey` is used as the `recipient_public_key` argument to
+/// [`seal`](crate::seal) and is returned alongside the plaintext from
+/// [`open`](crate::open) so the caller can identify the sender.
+///
+/// `PublicKey` implements [`Clone`] and [`PartialEq`], making it suitable
+/// for storage in directories or trust stores.
 #[derive(Clone, PartialEq, Eq)]
 pub struct PublicKey {
     pub(crate) signing: SigningPublicKey,

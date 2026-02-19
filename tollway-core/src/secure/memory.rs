@@ -1,3 +1,14 @@
+//! Secure memory wrappers with automatic zeroization.
+//!
+//! This module provides `SecretBytes` and `SecretVec`, which wrap
+//! fixed-size arrays and dynamically-sized vectors respectively. Both
+//! implement [`Zeroize`](zeroize::Zeroize) and
+//! [`ZeroizeOnDrop`](zeroize::ZeroizeOnDrop), ensuring that secret key
+//! material is overwritten with zeros when the value is dropped.
+//!
+//! These types are used internally to hold AEAD keys, KEM shared secrets,
+//! and other sensitive values that must not persist in memory after use.
+
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// A fixed-size array wrapper that automatically zeros memory on drop.
